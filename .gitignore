@@ -1,0 +1,45 @@
+# Laravel Backend
+valpay_backend/.env
+valpay_backend/vendor/
+valpay_backend/node_modules/
+valpay_backend/storage/logs/*.log
+valpay_backend/storage/framework/cache/
+valpay_backend/storage/framework/sessions/
+valpay_backend/storage/framework/views/
+valpay_backend/bootstrap/cache/*.php
+valpay_backend/public/hot
+valpay_backend/public/storage
+valpay_backend/.phpunit.result.cache
+valpay_backend/coverage/
+
+# Flutter Frontend
+valpay_frontend/.dart_tool/
+valpay_frontend/.packages
+valpay_frontend/.pub-cache/
+valpay_frontend/.pub/
+valpay_frontend/build/
+valpay_frontend/android/.gradle/
+valpay_frontend/android/captures/
+valpay_frontend/android/gradlew
+valpay_frontend/android/gradlew.bat
+valpay_frontend/android/local.properties
+valpay_frontend/android/GeneratedPluginRegistrant.java
+valpay_frontend/ios/.symlinks/
+valpay_frontend/ios/Flutter/Flutter.framework/
+valpay_frontend/ios/Flutter/Flutter.podspec
+valpay_frontend/ios/Flutter/engine/
+valpay_frontend/ios/Flutter/Generated.xcconfig
+valpay_frontend/ios/Flutter/app.flx
+valpay_frontend/ios/Flutter/app.zip
+valpay_frontend/ios/Flutter/flutter_assets/
+valpay_frontend/ios/ServiceDefinitions.json
+valpay_frontend/ios/Runner/GeneratedPluginRegistrant.*
+valpay_frontend/web/
+
+# General
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/settings.json
