@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/bloc/auth_bloc.dart';
 import 'features/auth/screens/login_screen.dart';
+import 'features/auth/screens/register_screen.dart';
 import 'features/wallet/bloc/wallet_bloc.dart';
 import 'features/wallet/screens/dashboard_screen.dart';
 import 'features/payment/screens/deposit_screen.dart';
@@ -35,7 +36,7 @@ class ValPayApp extends StatelessWidget {
         routes: {
           '/landing': (_) => const LandingScreen(),
           '/login': (_) => const LoginScreen(),
-          '/register': (_) => const _RegisterPlaceholder(),
+          '/register': (_) => const RegisterScreen(),
           '/splash': (_) => const SplashScreen(),
           '/dashboard': (_) => kIsWeb ? const WebDashboardWrapper() : const MobileShell(),
           '/deposit': (_) => const DepositScreen(),
@@ -197,18 +198,6 @@ class WebDashboardWrapper extends StatelessWidget {
 }
 
 // Placeholder screens
-class _RegisterPlaceholder extends StatelessWidget {
-  const _RegisterPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Inscription')),
-      body: const Center(child: Text('Écran d\'inscription — à implémenter')),
-    );
-  }
-}
-
 class _WithdrawPlaceholder extends StatelessWidget {
   const _WithdrawPlaceholder();
 
