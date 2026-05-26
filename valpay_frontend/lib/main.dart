@@ -79,24 +79,45 @@ class _SplashScreenState extends State<SplashScreen> {
       },
       child: Scaffold(
         backgroundColor: AppColors.primary,
-        body: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('VP',
+        body: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFF0D2247), Color(0xFF1A3A6B), Color(0xFF2563EB)],
+              stops: [0.0, 0.5, 1.0],
+            ),
+          ),
+          child: const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image(
+                  image: AssetImage('assets/images/logo.png'),
+                  width: 160,
+                  height: 160,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'PAIEMENTS SIMPLIFIÉS',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 64,
-                      fontWeight: FontWeight.bold)),
-              SizedBox(height: 8),
-              Text('ValPay',
-                  style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w300)),
-              SizedBox(height: 40),
-              CircularProgressIndicator(color: Colors.white),
-            ],
+                    color: Colors.white60,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 3,
+                  ),
+                ),
+                SizedBox(height: 48),
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -156,13 +177,23 @@ class WebDashboardWrapper extends StatelessWidget {
             color: AppColors.primary,
             child: Column(
               children: [
-                const SizedBox(height: 32),
-                const Text('ValPay',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold)),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
+                const Image(
+                  image: AssetImage('assets/images/logo.png'),
+                  width: 80,
+                  height: 80,
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'PAIEMENTS SIMPLIFIÉS',
+                  style: TextStyle(
+                    color: Colors.white54,
+                    fontSize: 9,
+                    letterSpacing: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 24),
                 ...[
                   ('Tableau de bord', Icons.dashboard_outlined, '/dashboard'),
                   ('Transactions', Icons.history_outlined, '/history'),

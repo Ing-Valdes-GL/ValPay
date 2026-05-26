@@ -818,22 +818,13 @@ class _ValPayLogo extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: ShaderMask(
-          shaderCallback: (bounds) => const LinearGradient(
-            colors: [Color(0xFF1A3A6B), Color(0xFF2563EB)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ).createShader(bounds),
-          child: Text(
-            'VP',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: size * 0.38,
-              fontWeight: FontWeight.w900,
-              letterSpacing: -1,
-            ),
-          ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(size * 0.22),
+        child: Image.asset(
+          'assets/images/logo.png',
+          width: size,
+          height: size,
+          fit: BoxFit.contain,
         ),
       ),
     );
