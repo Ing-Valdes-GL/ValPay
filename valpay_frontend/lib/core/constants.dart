@@ -1,8 +1,13 @@
+import 'package:flutter/foundation.dart';
+
 class AppConstants {
-  static const String baseUrl = String.fromEnvironment(
-    'API_URL',
-    defaultValue: 'http://10.0.2.2:8000/api/v1', // Android emulator → localhost
-  );
+  static const String _apiUrl = String.fromEnvironment('API_URL', defaultValue: '');
+
+  static String get baseUrl {
+    if (_apiUrl.isNotEmpty) return _apiUrl;
+    if (kIsWeb) return 'https://valpay-backend-production.up.railway.app/api/v1';
+    return 'http://10.0.2.2:8000/api/v1'; // Android emulator → localhost
+  }
 
   static const String appName = 'ValPay';
   static const String currency = 'XAF';

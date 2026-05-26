@@ -8,12 +8,17 @@ return [
 
     'allowed_origins' => [
         env('FRONTEND_URL', 'http://localhost:3000'),
-        env('MOBILE_APP_URL', 'valpay://'),
-        'http://localhost:*',
-        'http://127.0.0.1:*',
+        'http://localhost:3000',
+        'http://localhost:4000',
+        'http://127.0.0.1:3000',
     ],
 
-    'allowed_origins_patterns' => [],
+    'allowed_origins_patterns' => [
+        '#^https://.*\.vercel\.app$#',
+        '#^https://valpay.*$#',
+        '#^http://localhost:\d+$#',
+        '#^http://127\.0\.0\.1:\d+$#',
+    ],
 
     'allowed_headers' => ['*'],
 
