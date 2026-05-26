@@ -34,7 +34,7 @@ valpay_frontend/ios/Flutter/app.zip
 valpay_frontend/ios/Flutter/flutter_assets/
 valpay_frontend/ios/ServiceDefinitions.json
 valpay_frontend/ios/Runner/GeneratedPluginRegistrant.*
-valpay_frontend/web/
+# valpay_frontend/web/ -- tracked for index.html customization
 
 # General
 .DS_Store
