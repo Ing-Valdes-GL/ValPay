@@ -5,7 +5,7 @@ class AppConstants {
 
   static String get baseUrl {
     if (_apiUrl.isNotEmpty) return _apiUrl;
-    if (kIsWeb) return 'https://valpay-backend-production.up.railway.app/api/v1';
+    if (kIsWeb) return 'https://valpay-production.up.railway.app/api/v1';
     return 'http://10.0.2.2:8000/api/v1'; // Android emulator → localhost
   }
 
