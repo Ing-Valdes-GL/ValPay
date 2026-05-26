@@ -25,14 +25,14 @@ class AppTheme {
           surface: AppColors.surface,
           background: AppColors.background,
         ),
-        fontFamily: 'Poppins',
+        fontFamily: null,
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           centerTitle: true,
           titleTextStyle: TextStyle(
-            fontFamily: 'Poppins',
+            fontFamily: null,
             fontWeight: FontWeight.w600,
             fontSize: 18,
             color: Colors.white,
@@ -45,7 +45,7 @@ class AppTheme {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(vertical: 16),
             textStyle: const TextStyle(
-              fontFamily: 'Poppins',
+              fontFamily: null,
               fontWeight: FontWeight.w600,
               fontSize: 16,
             ),
@@ -68,7 +68,7 @@ class AppTheme {
           ),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 0,
           color: AppColors.surface,
           shape: RoundedRectangleBorder(
