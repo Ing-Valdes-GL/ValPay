@@ -5,7 +5,9 @@ import '../constants.dart';
 class ApiClient {
   static ApiClient? _instance;
   late final Dio _dio;
-  final _storage = const FlutterSecureStorage();
+  final _storage = const FlutterSecureStorage(
+    webOptions: WebOptions(dbName: 'valpay_secure', publicKey: 'valpay_pk'),
+  );
 
   ApiClient._() {
     _dio = Dio(BaseOptions(

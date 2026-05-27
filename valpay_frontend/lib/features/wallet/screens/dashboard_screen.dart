@@ -63,6 +63,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       childCount: state.transactions.take(5).length,
                     ),
                   )
+                else if (state is WalletError)
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        children: [
+                          const Icon(Icons.wifi_off_outlined, size: 48, color: AppColors.textSecondary),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Impossible de charger le solde',
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(state.message,
+                              style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                              textAlign: TextAlign.center),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: () => context.read<WalletBloc>().add(WalletLoadRequested()),
+                            icon: const Icon(Icons.refresh, size: 16),
+                            label: const Text('Réessayer'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
                 else
                   const SliverToBoxAdapter(
                     child: Center(
@@ -132,7 +158,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       _ActionItem(icon: Icons.add_circle_outline, label: 'Recharger', color: AppColors.success, route: '/deposit'),
       _ActionItem(icon: Icons.send_outlined, label: 'Envoyer', color: AppColors.primaryLight, route: '/transfer'),
       _ActionItem(icon: Icons.download_outlined, label: 'Retirer', color: AppColors.warning, route: '/withdraw'),
-      _ActionItem(icon: Icons.signal_cellular_alt, label: 'Forfaits', color: AppColors.accent, route: '/telecom'),
+      _ActionItem(icon: Icons.qr_code_outlined, label: 'QR Code', color: AppColors.accent, route: '/qr'),
     ];
 
     return Container(
