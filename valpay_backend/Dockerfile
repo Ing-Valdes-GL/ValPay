@@ -12,11 +12,11 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /app
 COPY . .
 
-RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts \
-    && php artisan package:discover --ansi
-
 RUN mkdir -p storage/framework/{sessions,views,cache/data} bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
+
+RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts \
+    && php artisan package:discover --ansi
 
 COPY start.sh /start.sh
 RUN chmod +x /start.sh
