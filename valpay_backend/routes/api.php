@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\QrCodeController;
-use App\Http\Controllers\Api\TelecomController;
 use App\Http\Controllers\Api\WalletController;
 use Illuminate\Support\Facades\Route;
 
@@ -59,9 +58,4 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
         Route::post('withdraw', [PaymentController::class, 'withdraw']);
     });
 
-    // Forfaits Télécom
-    Route::prefix('telecom')->group(function () {
-        Route::get('plans', [TelecomController::class, 'plans']);
-        Route::post('purchase', [TelecomController::class, 'purchase'])->middleware('pin');
-    });
 });

@@ -27,11 +27,4 @@ return [
         'redirect_url' => env('CAMPAY_REDIRECT_URL'),
     ],
 
-    'reloadly' => [
-        'client_id' => env('RELOADLY_CLIENT_ID'),
-        'client_secret' => env('RELOADLY_CLIENT_SECRET'),
-        'base_url' => env('RELOADLY_BASE_URL', 'https://topups.reloadly.com'),
-        'auth_url' => env('RELOADLY_AUTH_URL', 'https://auth.reloadly.com'),
-    ],
-
 ];

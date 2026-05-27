@@ -10,7 +10,6 @@ import 'features/wallet/bloc/wallet_bloc.dart';
 import 'features/wallet/screens/dashboard_screen.dart';
 import 'features/payment/screens/deposit_screen.dart';
 import 'features/payment/screens/transfer_screen.dart';
-import 'features/telecom/screens/telecom_screen.dart';
 import 'features/qr/screens/qr_screen.dart';
 import 'features/web/screens/landing_screen.dart';
 
@@ -42,7 +41,6 @@ class ValPayApp extends StatelessWidget {
           '/deposit': (_) => const DepositScreen(),
           '/transfer': (_) => const TransferScreen(),
           '/withdraw': (_) => const _WithdrawPlaceholder(),
-          '/telecom': (_) => const TelecomScreen(),
           '/qr': (_) => const QrScreen(),
           '/history': (_) => const _HistoryPlaceholder(),
           '/privacy': (_) => const _LegalScreen(title: 'Politique de Confidentialité', isPrivacy: true),
@@ -138,7 +136,6 @@ class _MobileShellState extends State<MobileShell> {
   final _screens = [
     const DashboardScreen(),
     const QrScreen(),
-    const TelecomScreen(),
     const _HistoryPlaceholder(),
   ];
 
@@ -155,7 +152,6 @@ class _MobileShellState extends State<MobileShell> {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Accueil'),
           NavigationDestination(icon: Icon(Icons.qr_code_outlined), selectedIcon: Icon(Icons.qr_code), label: 'QR Code'),
-          NavigationDestination(icon: Icon(Icons.signal_cellular_alt_outlined), selectedIcon: Icon(Icons.signal_cellular_alt), label: 'Forfaits'),
           NavigationDestination(icon: Icon(Icons.history_outlined), selectedIcon: Icon(Icons.history), label: 'Historique'),
         ],
       ),
@@ -199,7 +195,6 @@ class WebDashboardWrapper extends StatelessWidget {
                   ('Transactions', Icons.history_outlined, '/history'),
                   ('Recharger', Icons.add_circle_outline, '/deposit'),
                   ('Envoyer', Icons.send_outlined, '/transfer'),
-                  ('Forfaits', Icons.signal_cellular_alt, '/telecom'),
                   ('QR Code', Icons.qr_code_outlined, '/qr'),
                 ]
                     .map((item) => ListTile(

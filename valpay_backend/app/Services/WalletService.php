@@ -131,34 +131,4 @@ class WalletService
         });
     }
 
-    /**
-     * Débite pour achat forfait télécom (solde wallet uniquement)
-     */
-    public function debitForAirtime(Wallet $wallet, float $amount, string $pin, array $metadata): Transaction
-    {
-        if (!$wallet->hasSufficientBalance($amount)) {
-            throw new \RuntimeException("Solde insuffisant pour cet achat: {$amount} XAF requis.");
-        }
-
-        if (!Hash::check($pin, $wallet->user->pin_code)) {
-            throw new \RuntimeException('Code PIN incorrect.');
-        }
-
-        return DB::transaction(function () use ($wallet, $amount, $metadata) {
-            Wallet::lockForUpdate()->find($wallet->id);
-            $wallet->decrement('balance', $amount);
-
-            return Transaction::create([
-                'reference' => Transaction::generateReference(),
-                'sender_wallet_id' => $wallet->id,
-                'type' => 'airtime_purchase',
-                'amount' => $amount,
-                'fee' => 0.00,
-                'net_amount' => $amount,
-                'status' => 'pending',
-                'provider' => 'reloadly',
-                'metadata' => $metadata,
-            ]);
-        });
-    }
 }
