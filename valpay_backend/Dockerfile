@@ -18,8 +18,9 @@ RUN mkdir -p storage/framework/{sessions,views,cache/data} bootstrap/cache \
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts \
     && php artisan package:discover --ansi
 
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# Write startup script inline to avoid CRLF issues from Windows git
+RUN printf '#!/bin/sh\nphp artisan config:cache || true\nphp artisan route:cache || true\nexec php artisan serve --host=0.0.0.0 --port="${PORT:-8000}"\n' > /start.sh \
+    && chmod +x /start.sh
 
 EXPOSE 8000
 CMD ["/start.sh"]
