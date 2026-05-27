@@ -1,0 +1,10 @@
+# Force LF for all files by default
+* text=auto
+
+# Shell scripts must always be LF (Linux Docker)
+*.sh text eol=lf
+
+# PHP and other backend files
+*.php text eol=lf
+*.json text eol=lf
+*.env text eol=lf
