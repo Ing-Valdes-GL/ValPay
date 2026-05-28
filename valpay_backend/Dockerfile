@@ -19,7 +19,7 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction --no-script
     && php artisan package:discover --ansi
 
 # Start server immediately — no cache commands at runtime so Railway health check passes instantly
-RUN printf '#!/bin/sh\nexec php -S 0.0.0.0:${PORT:-8000} -t public/ public/router.php\n' > /start.sh \
+RUN printf '#!/bin/sh\nexec php -d memory_limit=256M -S 0.0.0.0:${PORT:-8000} -t public/ public/router.php\n' > /start.sh \
     && chmod +x /start.sh
 
 CMD ["/start.sh"]
