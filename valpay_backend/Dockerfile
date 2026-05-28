@@ -18,9 +18,8 @@ RUN mkdir -p storage/framework/{sessions,views,cache/data} bootstrap/cache \
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts \
     && php artisan package:discover --ansi
 
-# Write startup script inline to avoid CRLF issues from Windows git
-RUN printf '#!/bin/sh\nphp artisan config:cache || true\nphp artisan route:cache || true\nexec php -S 0.0.0.0:${PORT:-8000} -t public/ public/router.php\n' > /start.sh \
+# Start server immediately — no cache commands at runtime so Railway health check passes instantly
+RUN printf '#!/bin/sh\nexec php -S 0.0.0.0:${PORT:-8000} -t public/ public/router.php\n' > /start.sh \
     && chmod +x /start.sh
 
-EXPOSE 8000
 CMD ["/start.sh"]
