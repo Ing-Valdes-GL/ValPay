@@ -7,8 +7,9 @@ RUN apt-get update && apt-get install -y \
         pdo pdo_pgsql pgsql mbstring bcmath gd zip intl sodium \
     && rm -rf /var/lib/apt/lists/*
 
-# Enable Apache mod_rewrite for Laravel routing
-RUN a2enmod rewrite
+# Enable mod_rewrite, fix MPM conflict
+RUN a2dismod mpm_event mpm_worker 2>/dev/null || true \
+    && a2enmod mpm_prefork rewrite
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
