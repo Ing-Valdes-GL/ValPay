@@ -1,4 +1,4 @@
-FROM php:8.2-cli
+FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y \
     libpng-dev libpq-dev libzip-dev libonig-dev \
@@ -7,19 +7,28 @@ RUN apt-get update && apt-get install -y \
         pdo pdo_pgsql pgsql mbstring bcmath gd zip intl sodium \
     && rm -rf /var/lib/apt/lists/*
 
+# Enable Apache mod_rewrite for Laravel routing
+RUN a2enmod rewrite
+
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /app
+WORKDIR /var/www/html
 COPY . .
 
 RUN mkdir -p storage/framework/{sessions,views,cache/data} bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 775 storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
 
 RUN composer install --optimize-autoloader --no-dev --no-interaction --no-scripts \
     && php artisan package:discover --ansi
 
-# Start server immediately — no cache commands at runtime so Railway health check passes instantly
-RUN printf '#!/bin/sh\nexec php -d memory_limit=256M -S 0.0.0.0:${PORT:-8000} -t public/ public/router.php\n' > /start.sh \
+# Point Apache document root to Laravel's public/
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
+    && sed -i 's|</VirtualHost>|<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n</VirtualHost>|g' /etc/apache2/sites-available/000-default.conf
+
+# Use Railway's PORT env var for Apache
+RUN printf '#!/bin/sh\nsed -i "s/Listen 80/Listen ${PORT:-80}/" /etc/apache2/ports.conf\nsed -i "s/:80>/:${PORT:-80}>/" /etc/apache2/sites-available/000-default.conf\nexec apache2-foreground\n' > /start.sh \
     && chmod +x /start.sh
 
+EXPOSE 80
 CMD ["/start.sh"]
