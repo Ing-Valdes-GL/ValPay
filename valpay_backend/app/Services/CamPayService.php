@@ -54,7 +54,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = $this->client()->withToken($token)
+        $response = $this->client()->withToken($token, 'Token')
             ->post("{$this->baseUrl}/collect/", [
                 'amount' => (string) intval($amount),
                 'from' => $phone,
@@ -78,7 +78,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = $this->client()->withToken($token)
+        $response = $this->client()->withToken($token, 'Token')
             ->get("{$this->baseUrl}/transaction/{$campayReference}/");
 
         if ($response->failed()) {
@@ -95,7 +95,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = $this->client()->withToken($token)
+        $response = $this->client()->withToken($token, 'Token')
             ->post("{$this->baseUrl}/transfer/", [
                 'amount' => (string) intval($amount),
                 'to' => $phone,
@@ -127,7 +127,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = $this->client()->withToken($token)
+        $response = $this->client()->withToken($token, 'Token')
             ->get("{$this->baseUrl}/balance/");
 
         if ($response->failed()) {
