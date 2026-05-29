@@ -106,9 +106,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
           final errors = data['errors'] as Map;
           msg = errors.values.first.first as String;
         }
-      } catch (_) {
-        msg = e.toString().replaceAll('Exception: ', '');
-      }
+      } catch (_) {}
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
