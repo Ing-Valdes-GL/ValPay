@@ -33,6 +33,7 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
         Route::get('me', [AuthController::class, 'me']);
+        Route::post('pin', [AuthController::class, 'setPin']);
         Route::post('pin/set', [AuthController::class, 'setPin']);
         Route::put('pin/update', [AuthController::class, 'updatePin']);
     });
