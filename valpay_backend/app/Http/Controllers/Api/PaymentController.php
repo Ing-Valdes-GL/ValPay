@@ -23,7 +23,7 @@ class PaymentController extends Controller
     public function deposit(Request $request): JsonResponse
     {
         $request->validate([
-            'amount' => 'required|numeric|min:500|max:1000000',
+            'amount' => 'required|numeric|min:10|max:1000000',
             'phone' => ['required', 'string', 'regex:/^\+237[0-9]{9}$/'],
         ]);
 
@@ -143,7 +143,7 @@ class PaymentController extends Controller
     public function withdraw(Request $request): JsonResponse
     {
         $request->validate([
-            'amount' => 'required|numeric|min:500',
+            'amount' => 'required|numeric|min:10',
             'phone' => ['required', 'string', 'regex:/^\+237[0-9]{9}$/'],
             'pin' => 'required|digits:4',
         ]);

@@ -21,8 +21,8 @@ class AppConstants {
   // Limites
   static const double minTransactionAmount = 100;
   static const double maxTransactionAmount = 1000000;
-  static const double minDepositAmount = 500;
-  static const double minWithdrawalAmount = 500;
+  static const double minDepositAmount = 10;
+  static const double minWithdrawalAmount = 10;
 
   // Storage keys
   static const String tokenKey = 'auth_token';
