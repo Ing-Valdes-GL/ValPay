@@ -95,16 +95,14 @@ class PaymentController extends Controller
 
         if ($status === 'successful') {
             $wallet = $transaction->receiverWallet;
-            $this->walletService->credit(
-                $wallet,
-                $transaction->amount,
-                $transaction->reference,
-                'campay',
-                $data
-            );
-            // La méthode credit() crée une nouvelle transaction completed
-            // On supprime la pending pour éviter le doublon
-            $transaction->delete();
+            \Illuminate\Support\Facades\DB::transaction(function () use ($wallet, $transaction, $data) {
+                $wallet->lockForUpdate()->find($wallet->id);
+                $wallet->increment('balance', $transaction->amount);
+                $transaction->update([
+                    'status' => 'completed',
+                    'metadata' => array_merge((array) ($transaction->metadata ?? []), $data),
+                ]);
+            });
         } elseif ($status === 'failed') {
             $transaction->markFailed();
         }
@@ -158,8 +156,12 @@ class PaymentController extends Controller
                 $request->phone,
                 $request->pin,
             );
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
-            // Appel CamPay pour le reversement
+        // Appel CamPay pour le reversement — si ça échoue, on rembourse le wallet
+        try {
             $result = $this->camPay->disburse($request->phone, $request->amount);
             $transaction->update([
                 'provider_reference' => $result['reference'] ?? null,
@@ -172,8 +174,16 @@ class PaymentController extends Controller
                 'fee' => $transaction->fee,
                 'total_debited' => $transaction->amount + $transaction->fee,
             ]);
-        } catch (\RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+        } catch (\Exception $e) {
+            // CamPay a échoué : rembourser le wallet et marquer failed
+            $wallet = $request->user()->wallet;
+            \Illuminate\Support\Facades\DB::transaction(function () use ($wallet, $transaction) {
+                $wallet->lockForUpdate()->find($wallet->id);
+                $wallet->increment('balance', $transaction->amount + $transaction->fee);
+                $transaction->update(['status' => 'failed']);
+            });
+            Log::error('Withdrawal disburse failed', ['error' => $e->getMessage(), 'transaction' => $transaction->reference]);
+            return response()->json(['message' => 'Échec du retrait. Votre solde a été restitué.'], 502);
         }
     }
 

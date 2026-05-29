@@ -63,9 +63,25 @@ class _TransferScreenState extends State<TransferScreen> {
         );
       }
     } catch (e) {
+      String msg = 'Une erreur est survenue';
+      try {
+        final data = (e as dynamic).response?.data;
+        if (data is Map && data['message'] != null) {
+          msg = data['message'] as String;
+        } else if (data is Map && data['errors'] != null) {
+          final errors = data['errors'] as Map;
+          msg = errors.values.first.first as String;
+        }
+      } catch (_) {
+        msg = e.toString().replaceAll('Exception: ', '');
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     } finally {

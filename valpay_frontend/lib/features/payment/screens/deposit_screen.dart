@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants.dart';
 import '../../../core/api/api_client.dart';
+import 'payment_status_screen.dart';
 
 class DepositScreen extends StatefulWidget {
   const DepositScreen({super.key});
@@ -27,29 +28,35 @@ class _DepositScreenState extends State<DepositScreen> {
         'amount': double.parse(_amountCtrl.text),
       });
       if (mounted) {
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: const Text('Demande envoyée'),
-            content: Text(
-              'Veuillez valider le paiement sur votre téléphone.\n\nRéférence: ${response.data['reference']}',
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => PaymentStatusScreen(
+              reference: response.data['reference'] as String,
+              amount: double.parse(_amountCtrl.text),
             ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
           ),
         );
       }
     } catch (e) {
+      String msg = 'Une erreur est survenue';
+      try {
+        final data = (e as dynamic).response?.data;
+        if (data is Map && data['message'] != null) {
+          msg = data['message'] as String;
+        } else if (data is Map && data['errors'] != null) {
+          final errors = data['errors'] as Map;
+          msg = errors.values.first.first as String;
+        }
+      } catch (_) {
+        msg = e.toString().replaceAll('Exception: ', '');
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     } finally {

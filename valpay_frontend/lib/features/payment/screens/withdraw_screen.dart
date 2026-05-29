@@ -95,12 +95,27 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
         );
       }
     } catch (e) {
-      final msg = e.toString().contains('422')
-          ? 'Solde insuffisant ou PIN incorrect'
-          : e.toString().replaceAll('Exception: ', '');
+      String msg = 'Une erreur est survenue';
+      try {
+        // Extract actual server message from DioException
+        final dioErr = e as dynamic;
+        final data = dioErr.response?.data;
+        if (data is Map && data['message'] != null) {
+          msg = data['message'] as String;
+        } else if (data is Map && data['errors'] != null) {
+          final errors = data['errors'] as Map;
+          msg = errors.values.first.first as String;
+        }
+      } catch (_) {
+        msg = e.toString().replaceAll('Exception: ', '');
+      }
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(msg), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text(msg),
+            backgroundColor: AppColors.error,
+            duration: const Duration(seconds: 5),
+          ),
         );
       }
     } finally {

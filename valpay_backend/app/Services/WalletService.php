@@ -25,29 +25,6 @@ class WalletService
     }
 
     /**
-     * Crédite le portefeuille après confirmation CamPay (dépôt, frais 0%)
-     */
-    public function credit(Wallet $wallet, float $amount, string $reference, string $provider = 'campay', ?array $metadata = null): Transaction
-    {
-        return DB::transaction(function () use ($wallet, $amount, $reference, $provider, $metadata) {
-            $wallet->lockForUpdate()->find($wallet->id);
-            $wallet->increment('balance', $amount);
-
-            return Transaction::create([
-                'reference' => $reference,
-                'receiver_wallet_id' => $wallet->id,
-                'type' => 'deposit',
-                'amount' => $amount,
-                'fee' => 0.00,
-                'net_amount' => $amount,
-                'status' => 'completed',
-                'provider' => $provider,
-                'metadata' => $metadata,
-            ]);
-        });
-    }
-
-    /**
      * Transfert P2P interne — frais 1% à la charge de l'envoyeur
      * L'envoyeur paie montant + 1%, le récepteur reçoit le montant exact
      */
