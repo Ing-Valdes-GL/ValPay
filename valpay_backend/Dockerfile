@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y \
         pdo pdo_pgsql pgsql mbstring bcmath gd zip intl sodium \
     && rm -rf /var/lib/apt/lists/*
 
-# Remove ALL MPM modules, then enable only prefork + rewrite
+# mpm_prefork is compiled statically — only link its .conf (no .load)
+# Remove all other MPM .load/.conf, then enable rewrite
 RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
           /etc/apache2/mods-enabled/mpm_*.conf \
-    && ln -sf /etc/apache2/mods-available/mpm_prefork.load /etc/apache2/mods-enabled/mpm_prefork.load \
     && ln -sf /etc/apache2/mods-available/mpm_prefork.conf /etc/apache2/mods-enabled/mpm_prefork.conf \
     && ln -sf /etc/apache2/mods-available/rewrite.load     /etc/apache2/mods-enabled/rewrite.load
 
