@@ -20,8 +20,13 @@ Route::prefix('v1')->group(function () {
         ->name('campay.webhook');
 
     // Page de paiement par lien (accès public)
+    // IMPORTANT: routes spécifiques avant les routes paramétriques
+    Route::get('pay/receipt/{reference}', [PaymentController::class, 'downloadReceipt'])
+        ->name('payment.receipt');
     Route::get('pay/{walletId}', [PaymentController::class, 'paymentLinkInfo'])
         ->name('payment.link.info');
+    Route::get('pay/{walletId}/status/{reference}', [PaymentController::class, 'paymentStatus'])
+        ->name('payment.link.status');
     Route::post('pay/{walletId}', [PaymentController::class, 'payByLink'])
         ->name('payment.link.pay');
 });

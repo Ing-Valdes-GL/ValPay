@@ -8,6 +8,7 @@ use App\Services\CamPayService;
 use App\Services\WalletService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
@@ -192,13 +193,73 @@ class PaymentController extends Controller
      */
     public function paymentLinkInfo(string $walletId): JsonResponse
     {
-        $wallet = \App\Models\Wallet::with('user:id,name')->findOrFail($walletId);
+        $wallet = \App\Models\Wallet::with('user:id,name,phone_number')->findOrFail($walletId);
 
         return response()->json([
             'wallet_id' => $wallet->id,
             'recipient_name' => $wallet->user->name,
+            'recipient_phone' => $wallet->user->phone_number,
             'currency' => $wallet->currency,
         ]);
+    }
+
+    /**
+     * Vérifie le statut d'un paiement par lien (polling public)
+     */
+    public function paymentStatus(string $walletId, string $reference): JsonResponse
+    {
+        $wallet = \App\Models\Wallet::findOrFail($walletId);
+
+        $transaction = Transaction::where('reference', $reference)
+            ->where('receiver_wallet_id', $wallet->id)
+            ->where('type', 'deposit')
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['status' => 'not_found'], 404);
+        }
+
+        return response()->json([
+            'status' => $transaction->status,
+            'reference' => $transaction->reference,
+            'amount' => $transaction->amount,
+            'created_at' => $transaction->created_at,
+            'completed_at' => $transaction->status === 'completed' ? $transaction->updated_at : null,
+        ]);
+    }
+
+    /**
+     * Télécharge le reçu PDF d'un paiement par lien (public — reference comme token)
+     */
+    public function downloadReceipt(string $reference): mixed
+    {
+        $transaction = Transaction::where('reference', $reference)
+            ->where('type', 'deposit')
+            ->where('status', 'completed')
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['message' => 'Reçu introuvable ou paiement non encore confirmé.'], 404);
+        }
+
+        $metadata = (array) ($transaction->metadata ?? []);
+        if (empty($metadata['via_link'])) {
+            return response()->json(['message' => 'Reçu non disponible pour ce type de transaction.'], 403);
+        }
+
+        $recipient = $transaction->receiverWallet->user;
+
+        $pdf = Pdf::loadView('receipts.payment', [
+            'reference'      => $transaction->reference,
+            'amount'         => $transaction->amount,
+            'payer_name'     => $metadata['payer_name'] ?? 'Anonyme',
+            'payer_phone'    => $metadata['phone'] ?? '',
+            'recipient_name' => $recipient->name,
+            'recipient_phone'=> $recipient->phone_number,
+            'date'           => $transaction->updated_at ?? $transaction->created_at,
+        ])->setPaper('a4');
+
+        return $pdf->download("recu_valpay_{$reference}.pdf");
     }
 
     /**

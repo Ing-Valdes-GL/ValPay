@@ -211,20 +211,35 @@ class _QrScreenState extends State<QrScreen>
   }
 
   void _handleScannedData(String data) {
+    // Le QR code ValPay encode maintenant une URL : https://valpay-web.vercel.app/#/pay/{walletId}
+    final uri = Uri.tryParse(data);
+    if (uri != null) {
+      // Extraire le walletId depuis le fragment (#/pay/walletId)
+      final fragment = uri.fragment; // "/pay/WALLET_ID"
+      if (fragment.startsWith('/pay/')) {
+        final walletId = fragment.substring(5);
+        Navigator.of(context).pushNamed('/pay/$walletId');
+        return;
+      }
+      // Fallback : URL directe /pay/walletId dans le path
+      final segments = uri.pathSegments;
+      if (segments.length >= 2 && segments[0] == 'pay') {
+        Navigator.of(context).pushNamed('/pay/${segments[1]}');
+        return;
+      }
+    }
+    // Ancien format JSON (compatibilité)
     try {
       final payload = Map<String, dynamic>.from(jsonDecode(data));
-      if (payload['type'] == 'valpay_payment') {
+      if (payload['type'] == 'valpay_payment' && payload['phone'] != null) {
         Navigator.of(context).pushNamed('/transfer',
             arguments: {'recipient_phone': payload['phone']});
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('QR code non reconnu')),
-        );
+        return;
       }
-    } catch (_) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('QR code invalide')),
-      );
-    }
+    } catch (_) {}
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('QR code non reconnu')),
+    );
   }
 }

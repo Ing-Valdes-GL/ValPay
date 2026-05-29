@@ -15,6 +15,7 @@ import 'features/qr/screens/qr_screen.dart';
 import 'features/auth/screens/pin_setup_screen.dart';
 import 'features/web/screens/landing_screen.dart';
 import 'features/wallet/screens/history_screen.dart';
+import 'features/web/screens/payment_link_screen.dart';
 
 void main() {
   runApp(const ValPayApp());
@@ -49,6 +50,20 @@ class ValPayApp extends StatelessWidget {
           '/history': (_) => const HistoryScreen(),
           '/privacy': (_) => const _LegalScreen(title: 'Politique de Confidentialité', isPrivacy: true),
           '/terms': (_) => const _LegalScreen(title: 'Conditions Générales d\'Utilisation', isPrivacy: false),
+        },
+        onGenerateRoute: (settings) {
+          final name = settings.name ?? '';
+          // Route dynamique pour les liens de paiement : /pay/{walletId}
+          if (name.startsWith('/pay/') && !name.contains('/status/')) {
+            final walletId = name.substring(5);
+            if (walletId.isNotEmpty) {
+              return MaterialPageRoute(
+                settings: settings,
+                builder: (_) => PaymentLinkScreen(walletId: walletId),
+              );
+            }
+          }
+          return null;
         },
       ),
     );

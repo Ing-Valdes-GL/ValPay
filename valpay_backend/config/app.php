@@ -8,6 +8,7 @@ return [
     'env' => env('APP_ENV', 'production'),
     'debug' => (bool) env('APP_DEBUG', false),
     'url' => env('APP_URL', 'http://localhost'),
+    'frontend_url' => env('APP_FRONTEND_URL', 'https://valpay-web.vercel.app'),
     'timezone' => env('APP_TIMEZONE', 'Africa/Douala'),
     'locale' => env('APP_LOCALE', 'fr'),
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'fr'),
