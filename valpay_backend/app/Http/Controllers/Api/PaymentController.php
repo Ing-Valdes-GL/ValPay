@@ -86,7 +86,7 @@ class PaymentController extends Controller
 
         $transaction = Transaction::where('reference', $externalRef)
             ->where('type', 'deposit')
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending', 'failed'])
             ->first();
 
         if (!$transaction) {
