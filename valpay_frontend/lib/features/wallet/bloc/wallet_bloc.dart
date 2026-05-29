@@ -22,9 +22,17 @@ class WalletLoaded extends WalletState {
   final double balance;
   final String currency;
   final List<Map<String, dynamic>> transactions;
-  WalletLoaded({required this.balance, required this.currency, required this.transactions});
+  final String userName;
+  final String userPhone;
+  WalletLoaded({
+    required this.balance,
+    required this.currency,
+    required this.transactions,
+    required this.userName,
+    required this.userPhone,
+  });
   @override
-  List<Object?> get props => [balance, transactions];
+  List<Object?> get props => [balance, transactions, userName, userPhone];
 }
 class WalletError extends WalletState {
   final String message;
@@ -45,15 +53,19 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
       final results = await Future.wait([
         _api.dio.get('/wallet/balance'),
         _api.dio.get('/wallet/transactions'),
+        _api.dio.get('/auth/me'),
       ]);
 
       final balanceData = results[0].data;
       final txData = results[1].data;
+      final userData = results[2].data;
 
       emit(WalletLoaded(
         balance: double.parse(balanceData['balance'].toString()),
         currency: balanceData['currency'] ?? 'XAF',
         transactions: List<Map<String, dynamic>>.from(txData['data'] ?? []),
+        userName: userData['name'] ?? '',
+        userPhone: userData['phone_number'] ?? '',
       ));
     } catch (e) {
       emit(WalletError(message: e.toString()));

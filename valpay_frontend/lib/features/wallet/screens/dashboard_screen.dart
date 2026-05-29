@@ -32,7 +32,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: CustomScrollView(
               slivers: [
                 SliverAppBar(
-                  expandedHeight: 220,
+                  expandedHeight: 260,
                   pinned: true,
                   backgroundColor: AppColors.primary,
                   flexibleSpace: FlexibleSpaceBar(
@@ -108,6 +108,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildBalanceCard(WalletState state) {
     final balance = state is WalletLoaded ? state.balance : 0.0;
+    final userName = state is WalletLoaded ? state.userName : '';
+    final userPhone = state is WalletLoaded ? state.userPhone : '';
     final fmt = NumberFormat('#,##0', 'fr_CM');
 
     return Container(
@@ -123,6 +125,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
+          if (userName.isNotEmpty)
+            Text(
+              userName,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          if (userPhone.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                userPhone,
+                style: const TextStyle(color: Colors.white60, fontSize: 12),
+              ),
+            ),
           Row(
             children: [
               const Text('Solde disponible',

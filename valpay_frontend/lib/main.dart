@@ -14,6 +14,7 @@ import 'features/payment/screens/withdraw_screen.dart';
 import 'features/qr/screens/qr_screen.dart';
 import 'features/auth/screens/pin_setup_screen.dart';
 import 'features/web/screens/landing_screen.dart';
+import 'features/wallet/screens/history_screen.dart';
 
 void main() {
   runApp(const ValPayApp());
@@ -45,7 +46,7 @@ class ValPayApp extends StatelessWidget {
           '/withdraw': (_) => const WithdrawScreen(),
           '/qr': (_) => const QrScreen(),
           '/pin': (_) => const PinSetupScreen(),
-          '/history': (_) => const _HistoryPlaceholder(),
+          '/history': (_) => const HistoryScreen(),
           '/privacy': (_) => const _LegalScreen(title: 'Politique de Confidentialité', isPrivacy: true),
           '/terms': (_) => const _LegalScreen(title: 'Conditions Générales d\'Utilisation', isPrivacy: false),
         },
@@ -139,7 +140,7 @@ class _MobileShellState extends State<MobileShell> {
   final _screens = [
     const DashboardScreen(),
     const QrScreen(),
-    const _HistoryPlaceholder(),
+    const HistoryScreen(),
     const PinSetupScreen(),
   ];
 

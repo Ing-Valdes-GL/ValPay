@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -153,13 +154,42 @@ class _QrScreenState extends State<QrScreen>
   }
 
   Widget _buildScannerTab() {
-    return MobileScanner(
-      onDetect: (capture) {
-        final barcode = capture.barcodes.firstOrNull;
-        if (barcode?.rawValue != null) {
-          _handleScannedData(barcode!.rawValue!);
-        }
-      },
+    return Stack(
+      children: [
+        MobileScanner(
+          onDetect: (capture) {
+            final barcode = capture.barcodes.firstOrNull;
+            if (barcode?.rawValue != null) {
+              _handleScannedData(barcode!.rawValue!);
+            }
+          },
+        ),
+        Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: 240,
+            height: 240,
+            decoration: BoxDecoration(
+              border: Border.all(color: AppColors.primary, width: 3),
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+        Align(
+          alignment: const Alignment(0, 0.7),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'Pointez vers un QR code ValPay',
+              style: TextStyle(color: Colors.white, fontSize: 13),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -182,33 +212,19 @@ class _QrScreenState extends State<QrScreen>
 
   void _handleScannedData(String data) {
     try {
-      final payload = Map<String, dynamic>.from(
-        (data.startsWith('{')) ? _parseJson(data) : {'raw': data},
-      );
+      final payload = Map<String, dynamic>.from(jsonDecode(data));
       if (payload['type'] == 'valpay_payment') {
         Navigator.of(context).pushNamed('/transfer',
             arguments: {'recipient_phone': payload['phone']});
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('QR code non reconnu')),
+        );
       }
     } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('QR code non reconnu')),
+        const SnackBar(content: Text('QR code invalide')),
       );
     }
-  }
-
-  Map<String, dynamic> _parseJson(String data) {
-    return Map<String, dynamic>.from(
-      (data.replaceAll('{', '').replaceAll('}', '').split(',').fold(
-          <String, dynamic>{},
-          (map, pair) {
-            final parts = pair.split(':');
-            if (parts.length >= 2) {
-              final key = parts[0].trim().replaceAll('"', '');
-              final val = parts.sublist(1).join(':').trim().replaceAll('"', '');
-              map[key] = val;
-            }
-            return map;
-          })),
-    );
   }
 }
