@@ -65,7 +65,10 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json($request->user()->load('wallet'));
+        $user = $request->user()->load('wallet');
+        $data = $user->toArray();
+        $data['has_pin'] = !is_null($user->pin_code);
+        return response()->json($data);
     }
 
     public function setPin(Request $request): JsonResponse
