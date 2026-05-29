@@ -19,13 +19,22 @@ class CamPayService
         $this->password = config('services.campay.password');
     }
 
+    private function client(): \Illuminate\Http\Client\PendingRequest
+    {
+        return Http::withHeaders([
+            'Accept'          => 'application/json',
+            'Content-Type'    => 'application/json',
+            'User-Agent'      => 'ValPay/1.0 (+https://valpay.cm)',
+        ])->timeout(30);
+    }
+
     private function authenticate(): string
     {
         if ($this->token) {
             return $this->token;
         }
 
-        $response = Http::post("{$this->baseUrl}/token/", [
+        $response = $this->client()->post("{$this->baseUrl}/token/", [
             'username' => $this->username,
             'password' => $this->password,
         ]);
@@ -45,7 +54,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = Http::withToken($token)
+        $response = $this->client()->withToken($token)
             ->post("{$this->baseUrl}/collect/", [
                 'amount' => (string) intval($amount),
                 'from' => $phone,
@@ -69,7 +78,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = Http::withToken($token)
+        $response = $this->client()->withToken($token)
             ->get("{$this->baseUrl}/transaction/{$campayReference}/");
 
         if ($response->failed()) {
@@ -86,7 +95,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = Http::withToken($token)
+        $response = $this->client()->withToken($token)
             ->post("{$this->baseUrl}/transfer/", [
                 'amount' => (string) intval($amount),
                 'to' => $phone,
@@ -118,7 +127,7 @@ class CamPayService
     {
         $token = $this->authenticate();
 
-        $response = Http::withToken($token)
+        $response = $this->client()->withToken($token)
             ->get("{$this->baseUrl}/balance/");
 
         if ($response->failed()) {
