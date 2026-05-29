@@ -10,7 +10,9 @@ import 'features/wallet/bloc/wallet_bloc.dart';
 import 'features/wallet/screens/dashboard_screen.dart';
 import 'features/payment/screens/deposit_screen.dart';
 import 'features/payment/screens/transfer_screen.dart';
+import 'features/payment/screens/withdraw_screen.dart';
 import 'features/qr/screens/qr_screen.dart';
+import 'features/auth/screens/pin_setup_screen.dart';
 import 'features/web/screens/landing_screen.dart';
 
 void main() {
@@ -40,8 +42,9 @@ class ValPayApp extends StatelessWidget {
           '/dashboard': (_) => kIsWeb ? const WebDashboardWrapper() : const MobileShell(),
           '/deposit': (_) => const DepositScreen(),
           '/transfer': (_) => const TransferScreen(),
-          '/withdraw': (_) => const _WithdrawPlaceholder(),
+          '/withdraw': (_) => const WithdrawScreen(),
           '/qr': (_) => const QrScreen(),
+          '/pin': (_) => const PinSetupScreen(),
           '/history': (_) => const _HistoryPlaceholder(),
           '/privacy': (_) => const _LegalScreen(title: 'Politique de Confidentialité', isPrivacy: true),
           '/terms': (_) => const _LegalScreen(title: 'Conditions Générales d\'Utilisation', isPrivacy: false),
@@ -137,6 +140,7 @@ class _MobileShellState extends State<MobileShell> {
     const DashboardScreen(),
     const QrScreen(),
     const _HistoryPlaceholder(),
+    const PinSetupScreen(),
   ];
 
   @override
@@ -153,6 +157,7 @@ class _MobileShellState extends State<MobileShell> {
           NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: 'Accueil'),
           NavigationDestination(icon: Icon(Icons.qr_code_outlined), selectedIcon: Icon(Icons.qr_code), label: 'QR Code'),
           NavigationDestination(icon: Icon(Icons.history_outlined), selectedIcon: Icon(Icons.history), label: 'Historique'),
+          NavigationDestination(icon: Icon(Icons.lock_outline), selectedIcon: Icon(Icons.lock), label: 'PIN'),
         ],
       ),
     );
@@ -162,60 +167,70 @@ class _MobileShellState extends State<MobileShell> {
 class WebDashboardWrapper extends StatelessWidget {
   const WebDashboardWrapper({super.key});
 
+  static final _navItems = [
+    ('Tableau de bord', Icons.dashboard_outlined, Icons.dashboard,  '/dashboard'),
+    ('Transactions',    Icons.history_outlined,   Icons.history,    '/history'),
+    ('Recharger',       Icons.add_circle_outline, Icons.add_circle, '/deposit'),
+    ('Envoyer',         Icons.send_outlined,      Icons.send,       '/transfer'),
+    ('Retirer',         Icons.arrow_circle_down_outlined, Icons.arrow_circle_down, '/withdraw'),
+    ('QR Code',         Icons.qr_code_outlined,   Icons.qr_code,    '/qr'),
+    ('Code PIN',        Icons.lock_outline,        Icons.lock,       '/pin'),
+  ];
+
+  Widget _sidebar(BuildContext context) => Container(
+        width: 220,
+        color: AppColors.primary,
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            const Image(image: AssetImage('assets/images/logo.png'), width: 72, height: 72),
+            const SizedBox(height: 4),
+            const Text('PAIEMENTS SIMPLIFIÉS',
+                style: TextStyle(color: Colors.white54, fontSize: 9,
+                    letterSpacing: 1.5, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 24),
+            ..._navItems.map((item) => ListTile(
+                  leading: Icon(item.$2, color: Colors.white70, size: 20),
+                  title: Text(item.$1,
+                      style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  onTap: () => Navigator.of(context).pushNamed(item.$4),
+                )),
+            const Spacer(),
+            ListTile(
+              leading: const Icon(Icons.logout, color: Colors.white70),
+              title: const Text('Déconnexion',
+                  style: TextStyle(color: Colors.white70, fontSize: 13)),
+              onTap: () => context.read<AuthBloc>().add(AuthLogoutRequested()),
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 600;
+
+    if (isMobile) {
+      // Mobile web: use bottom navigation bar + drawer
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: AppColors.primary,
+          iconTheme: const IconThemeData(color: Colors.white),
+          title: const Text('ValPay',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+        drawer: Drawer(child: _sidebar(context)),
+        body: const DashboardScreen(),
+      );
+    }
+
+    // Desktop web: persistent sidebar
     return Scaffold(
       body: Row(
         children: [
-          // Sidebar
-          Container(
-            width: 220,
-            color: AppColors.primary,
-            child: Column(
-              children: [
-                const SizedBox(height: 24),
-                const Image(
-                  image: AssetImage('assets/images/logo.png'),
-                  width: 80,
-                  height: 80,
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'PAIEMENTS SIMPLIFIÉS',
-                  style: TextStyle(
-                    color: Colors.white54,
-                    fontSize: 9,
-                    letterSpacing: 1.5,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                ...[
-                  ('Tableau de bord', Icons.dashboard_outlined, '/dashboard'),
-                  ('Transactions', Icons.history_outlined, '/history'),
-                  ('Recharger', Icons.add_circle_outline, '/deposit'),
-                  ('Envoyer', Icons.send_outlined, '/transfer'),
-                  ('QR Code', Icons.qr_code_outlined, '/qr'),
-                ]
-                    .map((item) => ListTile(
-                          leading: Icon(item.$2, color: Colors.white70, size: 20),
-                          title: Text(item.$1,
-                              style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                          onTap: () => Navigator.of(context).pushNamed(item.$3),
-                        ))
-                    .toList(),
-                const Spacer(),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.white70),
-                  title: const Text('Déconnexion',
-                      style: TextStyle(color: Colors.white70, fontSize: 13)),
-                  onTap: () => context.read<AuthBloc>().add(AuthLogoutRequested()),
-                ),
-                const SizedBox(height: 16),
-              ],
-            ),
-          ),
-          // Main content
+          _sidebar(context),
           const Expanded(child: DashboardScreen()),
         ],
       ),
