@@ -23,7 +23,7 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.4'
+          flutter-version: '3.41.6'
           channel: stable
           cache: true
 
@@ -36,12 +36,11 @@ jobs:
         run: flutter build apk --release --split-per-abi
 
       - name: Rename APKs
-        working-directory: valpay_frontend
         run: |
-          mkdir -p release
-          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk release/ValPay-arm64.apk
-          cp build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk release/ValPay-arm32.apk
-          cp build/app/outputs/flutter-apk/app-x86_64-release.apk release/ValPay-x64.apk
+          mkdir -p valpay_frontend/release
+          cp valpay_frontend/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk valpay_frontend/release/ValPay-arm64.apk
+          cp valpay_frontend/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk valpay_frontend/release/ValPay-arm32.apk
+          cp valpay_frontend/build/app/outputs/flutter-apk/app-x86_64-release.apk valpay_frontend/release/ValPay-x64.apk
 
       - name: Get version
         id: version
