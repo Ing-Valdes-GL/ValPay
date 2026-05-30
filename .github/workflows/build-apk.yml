@@ -10,6 +10,9 @@ jobs:
     name: Build Flutter APK
     runs-on: ubuntu-latest
 
+    env:
+      GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Xmx4g"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,22 +30,32 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Install Android NDK
+        run: |
+          NDK_VERSION=$(flutter --version --machine 2>/dev/null | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('flutterVersion',''))" 2>/dev/null || echo "")
+          # Flutter 3.41.x uses NDK 27.0.12077973
+          sdkmanager "ndk;27.0.12077973" --sdk_root=$ANDROID_SDK_ROOT 2>/dev/null || true
+          echo "NDK_HOME=$ANDROID_SDK_ROOT/ndk/27.0.12077973" >> $GITHUB_ENV
+
       - name: Get dependencies
         working-directory: valpay_frontend
         run: flutter pub get
 
-      - name: Build APK (release)
+      - name: Build APK (release, split per ABI)
         working-directory: valpay_frontend
-        run: flutter build apk --release --split-per-abi
-
-      - name: Rename APKs
         run: |
-          mkdir -p valpay_frontend/release
-          cp valpay_frontend/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk valpay_frontend/release/ValPay-arm64.apk
-          cp valpay_frontend/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk valpay_frontend/release/ValPay-arm32.apk
-          cp valpay_frontend/build/app/outputs/flutter-apk/app-x86_64-release.apk valpay_frontend/release/ValPay-x64.apk
+          flutter build apk --release --split-per-abi \
+            --dart-define=API_URL=https://valpay-production.up.railway.app/api/v1
 
-      - name: Get version
+      - name: Collect APKs
+        run: |
+          mkdir -p artifacts
+          cp valpay_frontend/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk  artifacts/ValPay-arm64.apk
+          cp valpay_frontend/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk artifacts/ValPay-arm32.apk
+          cp valpay_frontend/build/app/outputs/flutter-apk/app-x86_64-release.apk      artifacts/ValPay-x64.apk
+          ls -lh artifacts/
+
+      - name: Get version tag
         id: version
         run: echo "tag=v$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
 
@@ -52,20 +65,27 @@ jobs:
           tag_name: ${{ steps.version.outputs.tag }}
           name: "ValPay ${{ steps.version.outputs.tag }}"
           body: |
-            ## ValPay — Release Android
+            ## ValPay — Build Android
 
-            ### Télécharger
-            | Architecture | Fichier | Usage |
+            ### Télécharger l'APK
+
+            | Architecture | Fichier | Appareil |
             |---|---|---|
-            | **arm64-v8a** | ValPay-arm64.apk | Smartphones récents (recommandé) |
-            | **armeabi-v7a** | ValPay-arm32.apk | Anciens appareils 32-bit |
-            | **x86_64** | ValPay-x64.apk | Émulateurs |
+            | **arm64-v8a** | `ValPay-arm64.apk` | Smartphones récents 64-bit — **recommandé** |
+            | **armeabi-v7a** | `ValPay-arm32.apk` | Anciens appareils 32-bit |
+            | **x86_64** | `ValPay-x64.apk` | Émulateurs Android |
 
-            > **Note :** Activer "Sources inconnues" dans les paramètres Android avant l'installation.
+            ### Installation
+            1. Télécharger le fichier `ValPay-arm64.apk`
+            2. Sur Android : **Paramètres → Sécurité → Sources inconnues → Activer**
+            3. Ouvrir le fichier APK et installer
+
+            ---
+            Backend : `https://valpay-production.up.railway.app`
           files: |
-            valpay_frontend/release/ValPay-arm64.apk
-            valpay_frontend/release/ValPay-arm32.apk
-            valpay_frontend/release/ValPay-x64.apk
+            artifacts/ValPay-arm64.apk
+            artifacts/ValPay-arm32.apk
+            artifacts/ValPay-x64.apk
           draft: false
           prerelease: false
         env:
